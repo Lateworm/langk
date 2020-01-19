@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Lyngk</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <link rel="stylesheet" href="css/reset.css">
+  <link href="https://fonts.googleapis.com/css?family=Courier+Prime&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <section id='vue'>
+    <div>
+      <h1>LYNGK <br> Replay</h1><br>
+
+      <ul>
+        <li v-for='move in moveHistory'>
+          {{ move }}
+        </li>
+        <li>👀</li>
+        <li v-for='move in moveFuture' class='future'>
+          {{ move }}
+        </li>
+      </ul>
+
+      <button v-on:click='stepBack' :disabled='moveHistory.length < 1'>Back</button><br>
+      <button v-on:click='stepForward' :disabled='moveFuture.length < 1'>Forward</button>
+    </div>
+
+
+    <svg viewbox='0 0 800 893' height='893' xmlns='http://www.w3.org/2000/svg'>
+      <!-- y values are sin(60) * 100 * n -->
+
+      <text x='1' y='086.6'>A1</text><text x='777' y='086.6'>A1</text>
+      <text x='1' y='173.2'>B1</text><text x='777' y='173.2'>B4</text>
+      <text x='1' y='259.8'>C1</text><text x='777' y='259.8'>C7</text>
+      <text x='1' y='346.4'>D1</text><text x='777' y='346.4'>D6</text>
+      <text x='1' y='433.0'>E1</text><text x='777' y='433.0'>E7</text>
+      <text x='1' y='519.6'>F1</text><text x='777' y='519.6'>F6</text>
+      <text x='1' y='606.2'>G1</text><text x='777' y='606.2'>G7</text>
+      <text x='1' y='692.8'>H1</text><text x='777' y='692.8'>H4</text>
+      <text x='1' y='779.4'>I1</text><text x='777' y='779.4'>I1</text>
+
+      <polygon
+        points='400,86.6 450,173.2 550,173.2 600,259.8 700,259.8 650,346.4 700,433.0, 650,519.6 700,606.2 600,606.2 550,692.8 450,692.8
+               400,779.4 350,692.8 250,692.8 200,606.2 100,606.2 150,519.6, 100,433.0 150,346.4 100,259.8 200,259.8 250,173.2 350,173.2'
+      />
+
+      <line x1='250' y1='173.2' x2='550' y2='173.2'/><!-- b -->
+      <line x1='100' y1='259.8' x2='700' y2='259.8'/><!-- c -->
+      <line x1='150' y1='346.4' x2='650' y2='346.4'/><!-- d -->
+      <line x1='100' y1='433.0' x2='700' y2='433.0'/><!-- e -->
+      <line x1='150' y1='519.6' x2='650' y2='519.6'/><!-- f -->
+      <line x1='100' y1='606.2' x2='700' y2='606.2'/><!-- g -->
+      <line x1='250' y1='692.8' x2='550' y2='692.8'/><!-- h -->
+      
+
+      <line x1='400' y1='086.6' x2='700' y2='606.2'/><!-- a1 \ g7 -->
+      <line x1='250' y1='173.2' x2='550' y2='692.8'/><!-- b1 \ h4 -->
+      <line x1='350' y1='173.2' x2='600' y2='606.2'/><!-- b2 \ g6 -->
+      <line x1='550' y1='173.2' x2='700' y2='433.0'/><!-- b4 \ e7 -->
+      <line x1='100' y1='259.8' x2='400' y2='779.4'/><!-- c1 \ i1 -->
+      <line x1='200' y1='259.8' x2='450' y2='692.8'/><!-- c2 \ h3 -->
+      <line x1='100' y1='433.0' x2='250' y2='692.8'/><!-- e1 \ h1 -->
+
+      <line x1='400' y1='086.6' x2='100' y2='606.2'/><!-- a1 / g1 -->
+      <line x1='250' y1='173.2' x2='100' y2='433.0'/><!-- b1 / e1 -->
+      <line x1='450' y1='173.2' x2='200' y2='606.2'/><!-- b3 / g2 -->
+      <line x1='550' y1='173.2' x2='250' y2='692.8'/><!-- b4 / h1 -->
+      <line x1='600' y1='259.8' x2='350' y2='692.8'/><!-- c6 / h2 -->
+      <line x1='700' y1='259.8' x2='400' y2='779.4'/><!-- c7 / i1 -->
+      <line x1='700' y1='433.0' x2='550' y2='692.8'/><!-- e7 / h4 -->
+
+      <template v-for="row in boardState">
+        <template v-for="stack in row">
+          <circle
+            v-for='piece in stack'
+            :cx='piece.x'
+            :cy='piece.y'
+            r='35'
+            :class='piece.colour'/>
+        </template>
+      </template>
+    </svg>
+  </section>
+</body>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script type="text/javascript" src="js/index.vue.js"></script>
+
+</html>
