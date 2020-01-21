@@ -4,42 +4,46 @@ new Vue({
   data: {
     moveHistory: [],
     moveFuture: [],
-    boardInputString: 'r/grbr/rrwbkkb/gbbwwbz/bbwkwbz/bgggkr/wbrzrgw/kkwg/w', // invalid state!
+    showInput: true,
+    boardInput: 'r/grbr/rrwbkkb/gbbwwbz/bbwkwbz/bgggkr/wbrzrgw/kkwg/w', // invalid state!
     boardState: [],
+    firstMover: 'Cliff',
+    secondMover: 'Newvick',
+    moveInput:
+`e1d4
+e3d2
+^g d2d4
+b1c2
+e1d1
+f2d3
+g7g6
+f4e5
+g5h4
+d4g4
+e6f6
+^b e5d5
+^w g6f6
+c6c7
+h3f5
+c7b4
+c4c5
+d3c5
+a1b3
+c5d6
+f6e7
+b2c3
+^r c3h2
+f1g1
+g1g2
+h1f3
+c1d1
+-
+i1f3
+-
+h2e2`,
     moveHistory: [
     ],
     moveFuture: [
-      'e1d4',
-      'e3d2',
-      '^g d2d4', // the stack is not green and is linking through white, creating a stack with 2 blues. Probably should be green, since it links through green again later
-      'b1c2',
-      'e1d1', // we already moved e1 on the first move
-      'f2d3',
-      'g7g6',
-      'f4e5',
-      'g5h4',
-      'd4g4', // when a 5-stack is created, need to stop rendering it on the board
-      'e6f6',
-      '^b e5d5',
-      '^w g6f6',
-      'c6c7',
-      'h3f5',
-      'c7b4',
-      'c4c5',
-      'd3c5',
-      'a1b3',
-      'c5d6',
-      'f6e7',
-      'b2c3',
-      '^r c3h2',
-      'f1g1',
-      'g1g2',
-      'h1f3',
-      'c1d1',
-      '-',
-      'i1f3',
-      '-',
-      'h2e2',
     ],
     rowEnum: {
       a: 1,
@@ -70,13 +74,27 @@ new Vue({
   // picks at ^(color) and record before the move, so ^r is player picked red.
 
   created() {
+    // try to restore previous work from localStorage
+    localBoardInput = localStorage.getItem('boardInput');
+    localMoveInput = localStorage.getItem('moveInput');
+    localFirstMover = localStorage.getItem('firstMover');
+    localSecondMover = localStorage.getItem('secondMover');
+
+    if (localBoardInput || localMoveInput) {
+      this.boardInput = localStorage.getItem('boardInput');
+      this.moveInput = localStorage.getItem('moveInput');
+      this.firstMover = localStorage.getItem('firstMover');
+      this.secondMover = localStorage.getItem('secondMover');
+    }
+
     this.buildBoard();
+    this.buildHistory();
     this.hydrateBoard();
   },
 
   methods: {
     buildBoard: function () {
-      const matchedState = this.boardInputString.match(/([^/]+)/g); // ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", "bgggkr", "wbrzrgw", "kkwg", "w"]
+      const matchedState = this.boardInput.match(/([^/]+)/g); // ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", "bgggkr", "wbrzrgw", "kkwg", "w"]
       let output = []
 
       matchedState.forEach((stackString, i) => {
@@ -98,10 +116,17 @@ new Vue({
       })
 
       this.boardState = output;
-      // TODO: cache this so we never have to do it again.
+      // TODO: cache this so we don't have to redo it every time move history gets updated.
+    },
+
+    buildHistory: function () {
+      // parse the input string into a usable structure
+      this.moveHistory = this.moveInput.match(/([^\r\n]+)/g) || [];
+      this.moveFuture = [];
     },
 
     hydrateBoard: function () {
+      // hydrate the board by playing through the resulting history
       this.moveHistory.forEach(move => {
         if (move.charAt(move.length-1) !== '-') {
           const fromRow = this.rowEnum[move.charAt(move.length-4)];
@@ -123,6 +148,27 @@ new Vue({
           })
         }
       })
+    },
+
+    updateBoardInput: function () {
+      // save work into localStorage
+      localStorage.setItem('boardInput', this.boardInput);
+      localStorage.setItem('firstMover', this.firstMover);
+      localStorage.setItem('secondMover', this.secondMover);
+
+      this.buildBoard();
+      this.hydrateBoard();
+    },
+
+    updateMoveInput: function () {
+      // save work into localStorage
+      localStorage.setItem('moveInput', this.moveInput);
+      localStorage.setItem('firstMover', this.firstMover);
+      localStorage.setItem('secondMover', this.secondMover);
+
+      this.buildBoard();
+      this.buildHistory();
+      this.hydrateBoard();
     },
 
     stepBack: function () {

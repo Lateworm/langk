@@ -15,23 +15,48 @@
 
 <body>
   <section id='vue'>
-    <div>
-      <h1>LYNGK <br> Replay</h1><br>
+    <div class='control-panel'>
+      <h1>LYNGK Replay Tool</h1><br>
 
-      <ul>
-        <li v-for='move in moveHistory'>
-          {{ move }}
-        </li>
-        <li>👀</li>
-        <li v-for='move in moveFuture' class='future'>
-          {{ move }}
-        </li>
-      </ul>
+      <button>
+        <span v-if='showInput' v-on:click='showInput = !showInput'>Go To Playback Mode</span>
+        <span v-if='!showInput' v-on:click='showInput = !showInput'>Go To Record/Edit Mode</span>
+      </button>
+      <br><br>
 
-      <button v-on:click='stepBack' :disabled='moveHistory.length < 1'>Back</button><br>
-      <button v-on:click='stepForward' :disabled='moveFuture.length < 1'>Forward</button>
+      <div v-if='showInput'>
+        <label>Initial board state</label><br>
+        <input type='text' size='52' v-model='boardInput' v-on:change='updateBoardInput'><br>
+
+        <label>First Mover</label><br>
+        <input type='text' size='16' v-model='firstMover'><br>
+
+        <label>Second Mover</label><br>
+        <input type='text' size='16' v-model='secondMover'><br>
+
+        <label>Move History</label><br>
+        <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateMoveInput' @keyup.enter.prevent='updateMoveInput'></textarea><br>
+      </div>
+
+      <div v-if='!showInput'>
+        <ul>
+          <li v-for='(move, i) in moveHistory'>
+            <span class='mover' v-if='i % 2 === 0'>{{ firstMover }}</span>
+            <span class='mover' v-if='i % 2 === 1'>{{ secondMover }}</span>
+            <span class='move'>{{ move }}</span>
+          </li>
+          <li>👀</li>
+          <li v-for='(move, i) in moveFuture' class='future'>
+            <span class='mover' v-if='(i + moveHistory.length) % 2 === 0'>{{ firstMover }}</span>
+            <span class='mover' v-if='(i + moveHistory.length) % 2 === 1'>{{ secondMover }}</span>
+            <span class='move'>{{ move }}</span>
+          </li>
+        </ul>
+
+        <button v-on:click='stepBack' :disabled='moveHistory.length < 1'>Back</button><br>
+        <button v-on:click='stepForward' :disabled='moveFuture.length < 1'>Forward</button>
+      </div>
     </div>
-
 
     <svg viewbox='0 0 800 893' height='893' xmlns='http://www.w3.org/2000/svg'>
       <!-- y values are sin(60) * 100 * n -->
@@ -48,7 +73,7 @@
 
       <polygon
         points='400,86.6 450,173.2 550,173.2 600,259.8 700,259.8 650,346.4 700,433.0, 650,519.6 700,606.2 600,606.2 550,692.8 450,692.8
-               400,779.4 350,692.8 250,692.8 200,606.2 100,606.2 150,519.6, 100,433.0 150,346.4 100,259.8 200,259.8 250,173.2 350,173.2'
+              400,779.4 350,692.8 250,692.8 200,606.2 100,606.2 150,519.6, 100,433.0 150,346.4 100,259.8 200,259.8 250,173.2 350,173.2'
       />
 
       <line x1='250' y1='173.2' x2='550' y2='173.2'/><!-- b -->
