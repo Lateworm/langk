@@ -141,6 +141,13 @@ h2e2`,
             this.boardState[toRow-1][toCol-1].push(piece)
           })
 
+          // remove stacks of 5 from the board
+          if(this.boardState[toRow-1][toCol-1].length === 5) {
+            this.boardState[toRow-1][toCol-1] = []
+          }
+
+          // calculate display coordinates
+          // these determine where the piece will appear on the SVG
           offsets = [400, 250, 100, 150, 100, 150, 100, 250, 400]
           this.boardState[toRow-1][toCol-1].forEach((piece, i) => {
             piece.x = 100 * (toCol-1) + offsets[toRow-1]
