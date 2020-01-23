@@ -4,7 +4,7 @@ new Vue({
   data: {
     moveHistory: [],
     moveFuture: [],
-    showInput: true,
+    showInput: false,
     boardInput: 'r/grbr/rrwbkkb/gbbwwbz/bbwkwbz/bgggkr/wbrzrgw/kkwg/w', // invalid state!
     boardState: [],
     firstMover: 'Cliff',
@@ -125,6 +125,12 @@ h2e2`,
       this.moveFuture = [];
     },
 
+    buildFuture: function () {
+      // parse the input string into a usable structure
+      this.moveFuture = this.moveInput.match(/([^\r\n]+)/g) || [];
+      this.moveHistory = [];
+    },
+
     hydrateBoard: function () {
       // hydrate the board by playing through the resulting history
       this.moveHistory.forEach(move => {
@@ -187,6 +193,18 @@ h2e2`,
     stepForward: function () {
       this.moveHistory.push(this.moveFuture.shift());
       this.buildBoard();
+      this.hydrateBoard();
+    },
+
+    goToStart: function () {
+      this.buildBoard();
+      this.buildFuture()
+      this.hydrateBoard();
+    },
+
+    goToEnd: function () {
+      this.buildBoard();
+      this.buildHistory();
       this.hydrateBoard();
     },
   },

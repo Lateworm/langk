@@ -16,7 +16,7 @@
 <body>
   <section id='vue'>
     <div class='control-panel'>
-      <h1>LYNGK Replay Tool</h1><br>
+      <h1>LYNGK Replay Tool</h1>
 
       <button>
         <span v-if='showInput' v-on:click='showInput = !showInput'>Go To Playback Mode</span>
@@ -24,37 +24,43 @@
       </button>
       <br><br>
 
+      <!-- Record/Edit Mode -->
       <div v-if='showInput'>
         <label>Initial board state</label><br>
         <input type='text' size='52' v-model='boardInput' v-on:change='updateBoardInput'><br>
 
         <label>First Mover</label><br>
-        <input type='text' size='16' v-model='firstMover'><br>
+        <input type='text' size='16' maxlength='16' v-model='firstMover'><br>
 
         <label>Second Mover</label><br>
-        <input type='text' size='16' v-model='secondMover'><br>
+        <input type='text' size='16' maxlength='16' v-model='secondMover'><br>
 
         <label>Move History</label><br>
         <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateMoveInput' @keyup.enter.prevent='updateMoveInput'></textarea><br>
       </div>
 
+      <!-- Playback Mode -->
       <div v-if='!showInput'>
+        <h2>Moves</h2>
         <ul>
           <li v-for='(move, i) in moveHistory'>
-            <span class='mover' v-if='i % 2 === 0'>{{ firstMover }}</span>
-            <span class='mover' v-if='i % 2 === 1'>{{ secondMover }}</span>
-            <span class='move'>{{ move }}</span>
+            <span v-if='i % 2 === 0'>{{ firstMover }}</span>
+            <span v-if='i % 2 === 1'>{{ secondMover }}</span>
+            <span>{{ move }}</span>
           </li>
           <li>👀</li>
           <li v-for='(move, i) in moveFuture' class='future'>
-            <span class='mover' v-if='(i + moveHistory.length) % 2 === 0'>{{ firstMover }}</span>
-            <span class='mover' v-if='(i + moveHistory.length) % 2 === 1'>{{ secondMover }}</span>
-            <span class='move'>{{ move }}</span>
+            <span v-if='(i + moveHistory.length) % 2 === 0'>{{ firstMover }}</span>
+            <span v-if='(i + moveHistory.length) % 2 === 1'>{{ secondMover }}</span>
+            <span>{{ move }}</span>
           </li>
         </ul>
 
-        <button v-on:click='stepBack' :disabled='moveHistory.length < 1'>Back</button><br>
-        <button v-on:click='stepForward' :disabled='moveFuture.length < 1'>Forward</button>
+        <button v-on:click='stepBack' :disabled='moveHistory.length < 1'>Step Back</button>
+        <button v-on:click='goToStart' :disabled='moveHistory.length < 1'>Start</button><br>
+
+        <button v-on:click='stepForward' :disabled='moveFuture.length < 1'>Step Forward</button>
+        <button v-on:click='goToEnd' :disabled='moveFuture.length < 1'>End</button><br>
       </div>
     </div>
 

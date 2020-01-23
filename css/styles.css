@@ -18,8 +18,14 @@ section {
 }
 
 h1 {
-  margin-top: 2rem;
   font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 input,
@@ -39,20 +45,24 @@ button {
   color: #999;
 }
 
-.mover {
-  display: inline-block;
-  width: 6rem;
+
+ul {
+  width: 16rem;
+  margin-bottom: .5rem;
 }
 
-.move {
-  text-align: right;
-  display: inline-block;
-  width: 5rem;
+li {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 6px;
+  padding-right: 6px;
+  border-radius: 4px;
 }
 
 li:nth-child(even) { 
   background-color: #ddd;
 }
+
 
 /* Styles for board display */
 
