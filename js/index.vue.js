@@ -1,3 +1,15 @@
+const pieceDisplayPosition = (position, height) => {
+  const [row, col] = [position[0], position[1]]
+  const rows = {a:1, b:2, c:3, d:4, e:5, f:6, g:7, h:8, i:9}
+  const rowXOffsets = [400, 250, 100, 150, 100, 150, 100, 250, 400]
+  const heightOffset = 8
+
+  return {
+    x: rowXOffsets[rows[row] - 1] + ((col-1) * 100),
+    y: Math.sin(1.0472) * rows[row] * 100 - (heightOffset * (height - 1)),
+  }
+}
+
 new Vue({
   el: '#vue',
 
@@ -5,42 +17,21 @@ new Vue({
     moveHistory: [],
     moveFuture: [],
     showInput: false,
-    boardInput: 'r/grbr/rrwbkkb/gbbwwbz/bbwkwbz/bgggkr/wbrzrgw/kkwg/w', // invalid state!
+    boardInput: 'g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b',
     boardState: [],
-    firstMover: 'Cliff',
-    secondMover: 'Newvick',
+    firstMover: 'Alf',
+    secondMover: 'Betty',
     moveInput:
-`e1d4
-e3d2
-^g d2d4
+`e3d2
 b1c2
 e1d1
-f2d3
 g7g6
-f4e5
 g5h4
-d4g4
 e6f6
 ^b e5d5
-^w g6f6
 c6c7
-h3f5
-c7b4
-c4c5
-d3c5
-a1b3
-c5d6
-f6e7
-b2c3
-^r c3h2
-f1g1
-g1g2
-h1f3
-c1d1
 -
-i1f3
--
-h2e2`,
+h3f5`,
     moveHistory: [
     ],
     moveFuture: [
@@ -57,21 +48,6 @@ h2e2`,
       i: 9,
     }
   },
-
-
-  // record with A1 at the top
-  // use / to break each row
-  // (r)ed
-  // (g)reen
-  // (w)hite
-  // (b)lue
-  // blac(k)
-  // wild(z)
-
-  // moves are start and end
-  // so e1d4 is move the piece at e1 to stack onto d4
-
-  // picks at ^(color) and record before the move, so ^r is player picked red.
 
   created() {
     // try to restore previous work from localStorage
@@ -94,21 +70,26 @@ h2e2`,
 
   methods: {
     buildBoard: function () {
-      const matchedState = this.boardInput.match(/([^/]+)/g); // ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", "bgggkr", "wbrzrgw", "kkwg", "w"]
+      // Get an array represent the rows like ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", ...
+      const rows = this.boardInput.match(/([^/]+)/g);
       let output = []
 
-      matchedState.forEach((stackString, i) => {
+      rows.forEach((row, i) => {
+        const rowLetter = 'abcdefghi'[i]
         let stack = []
-        const y = Math.sin(1.0472) * 100 * (i+1) // 60 deg === 1.0472 rad
         
-        stackString.split('').forEach((pieceLetter, j) => {
-          offsets = [400, 250, 100, 150, 100, 150, 100, 250, 400]
-          const x = 100 * (j) + offsets[i]
+        row.split('').forEach((pieceLetter, j) => {
+          const position = `${rowLetter}${j+1}`
+          
+          // Get the x,y coords for the SVG,
+          // Pass hardcoded 1 because at this point all stack are 1 piece tall
+          const {x, y} = pieceDisplayPosition(position, 1)
 
           stack.push([{
+            position: position,
+            colour: pieceLetter,
             y: y,
             x: x,
-            colour: pieceLetter,
           }])
         })
 
@@ -137,27 +118,31 @@ h2e2`,
         if (move.charAt(move.length-1) !== '-') {
           const fromRow = this.rowEnum[move.charAt(move.length-4)];
           const fromCol = parseInt(move.charAt(move.length-3));
-          const toRow = this.rowEnum[move.charAt(move.length-2)];
+          const toRowLetter = move.charAt(move.length-2)
+          const toRowNumber = this.rowEnum[move.charAt(move.length-2)];
           const toCol = parseInt(move.charAt(move.length-1));
+          const toPosition = `${toRowLetter}${toCol}`
 
-          stack = this.boardState[fromRow-1][fromCol-1].slice(0)
+          stackBeingMoved = this.boardState[fromRow-1][fromCol-1].slice(0)
           this.boardState[fromRow-1][fromCol-1] = []
           
-          stack.forEach((piece) => {
-            this.boardState[toRow-1][toCol-1].push(piece)
+          stackBeingMoved.forEach((piece) => {
+            // Update the piece's position
+            piece.position = toPosition
+
+            this.boardState[toRowNumber-1][toCol-1].push(piece)
           })
 
           // remove stacks of 5 from the board
-          if(this.boardState[toRow-1][toCol-1].length === 5) {
-            this.boardState[toRow-1][toCol-1] = []
+          if(this.boardState[toRowNumber-1][toCol-1].length === 5) {
+            this.boardState[toRowNumber-1][toCol-1] = []
           }
 
-          // calculate display coordinates
-          // these determine where the piece will appear on the SVG
-          offsets = [400, 250, 100, 150, 100, 150, 100, 250, 400]
-          this.boardState[toRow-1][toCol-1].forEach((piece, i) => {
-            piece.x = 100 * (toCol-1) + offsets[toRow-1]
-            piece.y = Math.sin(1.0472) * 100 * (toRow) - (7*i) // 60 deg === 1.0472 rad
+          this.boardState[toRowNumber-1][toCol-1].forEach((piece, i) => {
+            // Get the display coordinates
+            const {x, y} = pieceDisplayPosition(piece.position, i+1)
+            piece.x = x
+            piece.y = y
           })
         }
       })
