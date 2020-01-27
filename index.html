@@ -107,15 +107,13 @@
       <line x1='700' y1='259.8' x2='400' y2='779.4'/><!-- c7 / i1 -->
       <line x1='700' y1='433.0' x2='550' y2='692.8'/><!-- e7 / h4 -->
 
-      <template v-for="row in boardState">
-        <template v-for="stack in row">
-          <circle
-            v-for='piece in stack'
-            :cx='piece.x'
-            :cy='piece.y'
-            r='35'
-            :class='piece.colour'/>
-        </template>
+      <template v-for='stack in boardPlayState'>
+        <circle
+          v-for='piece in stack'
+          :cx='piece.x'
+          :cy='piece.y'
+          r='35'
+          :class='piece.colour'/>
       </template>
     </svg>
   </section>

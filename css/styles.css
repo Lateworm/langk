@@ -1,7 +1,7 @@
 :root {
-  --bg-main: hsl(40, 22%, 80%);
-  --bg-light: hsl(40, 22%, 85%);
-  --fg-light: hsl(40, 12%, 45%);
+  --bg-main: hsl(40, 18%, 80%);
+  --bg-light: hsl(40, 18%, 85%);
+  --fg-light: hsl(40, 10%, 45%);
 
   --red: hsl(0, 80%, 50%);
   --green: hsl(120, 82%, 35%);
@@ -45,6 +45,7 @@ input,
 textarea,
 button {
   background-color: var(--bg-light);
+  color: var(--black);
   font-family: 'Courier Prime', monospace;
   font-size: 1rem;
   margin-bottom: .5rem;
@@ -57,14 +58,14 @@ textarea {
 }
 
 button {
-  border: 1px solid var(--black);
+  border: 1px solid var(--fg-light);
   border-radius: 4px;
 }
 
+button:disabled,
 .future {
   color: var(--fg-light);
 }
-
 
 ul {
   width: 16rem;
@@ -97,6 +98,9 @@ svg line {
 }
 svg polygon {
   fill: var(--bg-light);
+}
+svg text {
+  fill: var(--black);
 }
 
 .r { fill: var(--red); }

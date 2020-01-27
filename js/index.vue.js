@@ -10,7 +10,73 @@ const pieceDisplayPosition = (position, height) => {
   }
 }
 
-new Vue({
+const emptyBoard = {
+  // each spot on the board is assigned an empty array of pieces
+  a1: [],
+  b1: [], b2: [], b3: [], b4: [],
+  c1: [], c2: [], c3: [], c4: [], c5: [], c6: [], c7: [],
+  d1: [], d2: [], d3: [], d4: [], d5: [], d6: [],
+  e1: [], e2: [], e3: [], e4: [], e5: [], e6: [], e7: [],
+  f1: [], f2: [], f3: [], f4: [], f5: [], f6: [],
+  g1: [], g2: [], g3: [], g4: [], g5: [], g6: [], g7: [],
+  h1: [], h2: [], h3: [], h4: [],
+  i1: [],
+}
+
+const buildStartState = (boardInput) => {
+  // Create an array of the rows like ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", ...
+  const rowStrings = boardInput.match(/([^/]+)/g);
+  let state = JSON.parse(JSON.stringify(emptyBoard))
+
+  rowStrings.forEach((rowString, i) => {
+    const row = 'abcdefghi'[i]
+    
+    rowString.split('').forEach((colour, columnIndex) => {
+      const position = `${row}${columnIndex + 1}`
+      const {x, y} = pieceDisplayPosition(position, 1)
+      state[position].push({ colour: colour, x: x, y: y })
+    })
+  })
+
+  return state
+}
+
+const hydrateBoard = (boardState, moves) => {
+  moves.forEach(move => {
+    if (move !== '-') {
+      const origin = move.substring(move.length-4, move.length-2)
+      const destination = move.substring(move.length-2, move.length)
+
+      // push the pieces onto the destination stack
+      boardState[origin].forEach(piece => {
+        boardState[destination].push(piece)
+      })
+
+      // clear the source stack
+      boardState[origin] = []
+      
+      // Remove stacks of 5 from the board
+      if (boardState[destination].length > 4) {
+        boardState[destination] = []
+      }
+
+      // update display coordinates
+      boardState[destination].forEach((piece, i) => {
+        const {x, y} = pieceDisplayPosition(destination, i+1)
+        piece.x = x
+        piece.y = y
+      })
+    }
+  })
+
+  return boardState
+}
+
+//  ---------
+//  -- VUE --
+//  ---------
+
+const langk = new Vue({
   el: '#vue',
 
   data: {
@@ -18,7 +84,8 @@ new Vue({
     moveFuture: [],
     showInput: false,
     boardInput: 'g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b',
-    boardState: [],
+    boardStartState: {},
+    boardPlayState: {},
     firstMover: 'Alf',
     secondMover: 'Betty',
     moveInput:
@@ -36,17 +103,6 @@ h3f5`,
     ],
     moveFuture: [
     ],
-    rowEnum: {
-      a: 1,
-      b: 2,
-      c: 3,
-      d: 4,
-      e: 5,
-      f: 6,
-      g: 7,
-      h: 8,
-      i: 9,
-    }
   },
 
   created() {
@@ -63,43 +119,16 @@ h3f5`,
       this.secondMover = localStorage.getItem('secondMover');
     }
 
-    this.buildBoard();
+    this.boardStartState = buildStartState(this.boardInput)
     this.buildHistory();
-    this.hydrateBoard();
+
+    this.boardPlayState = hydrateBoard(
+      JSON.parse(JSON.stringify(this.boardStartState)),
+      this.moveHistory
+    );
   },
 
   methods: {
-    buildBoard: function () {
-      // Get an array represent the rows like ["r", "grbr", "rrwbkkb", "gbwwbz", "bbwkwbz", ...
-      const rows = this.boardInput.match(/([^/]+)/g);
-      let output = []
-
-      rows.forEach((row, i) => {
-        const rowLetter = 'abcdefghi'[i]
-        let stack = []
-        
-        row.split('').forEach((pieceLetter, j) => {
-          const position = `${rowLetter}${j+1}`
-          
-          // Get the x,y coords for the SVG,
-          // Pass hardcoded 1 because at this point all stack are 1 piece tall
-          const {x, y} = pieceDisplayPosition(position, 1)
-
-          stack.push([{
-            position: position,
-            colour: pieceLetter,
-            y: y,
-            x: x,
-          }])
-        })
-
-        output.push(stack)
-      })
-
-      this.boardState = output;
-      // TODO: cache this so we don't have to redo it every time move history gets updated.
-    },
-
     buildHistory: function () {
       // parse the input string into a usable structure
       this.moveHistory = this.moveInput.match(/([^\r\n]+)/g) || [];
@@ -112,50 +141,16 @@ h3f5`,
       this.moveHistory = [];
     },
 
-    hydrateBoard: function () {
-      // hydrate the board by playing through the resulting history
-      this.moveHistory.forEach(move => {
-        if (move.charAt(move.length-1) !== '-') {
-          const fromRow = this.rowEnum[move.charAt(move.length-4)];
-          const fromCol = parseInt(move.charAt(move.length-3));
-          const toRowLetter = move.charAt(move.length-2)
-          const toRowNumber = this.rowEnum[move.charAt(move.length-2)];
-          const toCol = parseInt(move.charAt(move.length-1));
-          const toPosition = `${toRowLetter}${toCol}`
-
-          stackBeingMoved = this.boardState[fromRow-1][fromCol-1].slice(0)
-          this.boardState[fromRow-1][fromCol-1] = []
-          
-          stackBeingMoved.forEach((piece) => {
-            // Update the piece's position
-            piece.position = toPosition
-
-            this.boardState[toRowNumber-1][toCol-1].push(piece)
-          })
-
-          // remove stacks of 5 from the board
-          if(this.boardState[toRowNumber-1][toCol-1].length === 5) {
-            this.boardState[toRowNumber-1][toCol-1] = []
-          }
-
-          this.boardState[toRowNumber-1][toCol-1].forEach((piece, i) => {
-            // Get the display coordinates
-            const {x, y} = pieceDisplayPosition(piece.position, i+1)
-            piece.x = x
-            piece.y = y
-          })
-        }
-      })
-    },
-
     updateBoardInput: function () {
       // save work into localStorage
       localStorage.setItem('boardInput', this.boardInput);
       localStorage.setItem('firstMover', this.firstMover);
       localStorage.setItem('secondMover', this.secondMover);
 
-      this.buildBoard();
-      this.hydrateBoard();
+      this.boardPlayState = hydrateBoard(
+        JSON.parse(JSON.stringify(this.boardStartState)),
+        this.moveHistory
+      );
     },
 
     updateMoveInput: function () {
@@ -164,33 +159,40 @@ h3f5`,
       localStorage.setItem('firstMover', this.firstMover);
       localStorage.setItem('secondMover', this.secondMover);
 
-      this.buildBoard();
       this.buildHistory();
-      this.hydrateBoard();
+      this.boardPlayState = hydrateBoard(
+        JSON.parse(JSON.stringify(this.boardStartState)),
+        this.moveHistory
+      );
     },
 
     stepBack: function () {
       this.moveFuture.unshift(this.moveHistory.pop());
-      this.buildBoard();
-      this.hydrateBoard();
+      this.boardPlayState = hydrateBoard(
+        JSON.parse(JSON.stringify(this.boardStartState)),
+        this.moveHistory
+      );
     },
 
     stepForward: function () {
       this.moveHistory.push(this.moveFuture.shift());
-      this.buildBoard();
-      this.hydrateBoard();
+      this.boardPlayState = hydrateBoard(
+        JSON.parse(JSON.stringify(this.boardStartState)),
+        this.moveHistory
+      );
     },
 
     goToStart: function () {
-      this.buildBoard();
       this.buildFuture()
-      this.hydrateBoard();
+      this.boardPlayState = JSON.parse(JSON.stringify(this.boardStartState))
     },
 
     goToEnd: function () {
-      this.buildBoard();
       this.buildHistory();
-      this.hydrateBoard();
+      this.boardPlayState = hydrateBoard(
+        JSON.parse(JSON.stringify(this.boardStartState)),
+        this.moveHistory
+      );
     },
   },
 })
