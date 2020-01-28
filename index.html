@@ -36,11 +36,21 @@
         <input type='text' size='16' maxlength='16' v-model='secondMover'><br>
 
         <label>Move History</label><br>
-        <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateMoveInput'></textarea><br>
+        <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateInputs'></textarea><br>
       </div>
 
       <!-- Playback Mode -->
       <div v-if='!showInput'>
+        <h2>Players</h2>
+
+        <h3>{{ firstMover }}</h3>
+        <span>picks:</span><span v-for='pick in firstMoverPicks'>{{ pick }}</span><br>
+        <span>stacks:</span><span v-for='stack in p1Stacks'>{{ stack }}&nbsp;</span>
+
+        <h3>{{ secondMover }}</h3>
+        <span>picks:</span><span v-for='pick in secondMoverPicks'>{{ pick }}</span><br>
+        <span>stacks:</span><span v-for='stack in p2Stacks'>{{ stack }}&nbsp;</span>
+
         <h2>Moves</h2>
         <ul>
           <li v-for='(move, i) in moveHistory'>

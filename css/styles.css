@@ -30,16 +30,13 @@ section {
   width: 30rem;
 }
 
-h1 {
-  font-size: 1.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+h1, h2, h3 {
+  margin-top: 1.75rem;
+  margin-bottom: .85rem;
 }
-
-h2 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-}
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.2rem; }
 
 input,
 textarea,

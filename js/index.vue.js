@@ -42,10 +42,22 @@ const buildStartState = (boardInput) => {
 }
 
 const hydrateBoard = (boardState, moves) => {
-  moves.forEach(move => {
+  let p1Picks = []
+  let p2Picks = []
+  let p1Stacks = []
+  let p2Stacks = []
+
+  moves.forEach((move, i) => {
     if (move !== '-') {
       const origin = move.substring(move.length-4, move.length-2)
       const destination = move.substring(move.length-2, move.length)
+      const pick = move.substring(move.length-6, move.length-5)
+
+      if (pick.length && i % 2 === 0) {
+        p1Picks.push(pick)
+      } else if (pick.length && i % 2 === 1) {
+        p2Picks.push(pick)
+      }
 
       // push the pieces onto the destination stack
       boardState[origin].forEach(piece => {
@@ -57,6 +69,17 @@ const hydrateBoard = (boardState, moves) => {
       
       // Remove stacks of 5 from the board
       if (boardState[destination].length > 4) {
+        
+        if (i % 2 === 0) {
+          p1Stacks.push(boardState[destination].reduce((acc, cur) => {
+            return acc + cur.colour
+          }, ''))
+        } else if (i % 2 === 1) {
+          p2Stacks.push(boardState[destination].reduce((acc, cur) => {
+            return acc + cur.colour
+          }, ''))
+        }
+        
         boardState[destination] = []
       }
 
@@ -69,7 +92,7 @@ const hydrateBoard = (boardState, moves) => {
     }
   })
 
-  return boardState
+  return [ boardState, p1Picks, p2Picks, p1Stacks, p2Stacks ]
 }
 
 //  ---------
@@ -88,13 +111,17 @@ const langk = new Vue({
     boardPlayState: {},
     firstMover: 'Alf',
     secondMover: 'Betty',
+    firstMoverPicks: [],
+    secondMoverPicks: [],
+    p1Stacks: [],
+    p2Stacks: [],
     moveInput:
 `e3d2
 b1c2
 e1d1
 g7g6
 g5h4
-e6f6
+^g e6f6
 ^b e5d5
 c6c7
 -
@@ -115,7 +142,7 @@ h3f5`,
     this.boardStartState = buildStartState(this.boardInput)
     this.buildHistory();
 
-    this.boardPlayState = hydrateBoard(
+    [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
       JSON.parse(JSON.stringify(this.boardStartState)),
       this.moveHistory
     );
@@ -143,7 +170,7 @@ h3f5`,
 
       this.boardStartState = buildStartState(this.boardInput)
       this.buildHistory();
-      this.boardPlayState = hydrateBoard(
+      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
         JSON.parse(JSON.stringify(this.boardStartState)),
         this.moveHistory
       );
@@ -151,7 +178,7 @@ h3f5`,
 
     stepBack: function () {
       this.moveFuture.unshift(this.moveHistory.pop());
-      this.boardPlayState = hydrateBoard(
+      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
         JSON.parse(JSON.stringify(this.boardStartState)),
         this.moveHistory
       );
@@ -159,7 +186,7 @@ h3f5`,
 
     stepForward: function () {
       this.moveHistory.push(this.moveFuture.shift());
-      this.boardPlayState = hydrateBoard(
+      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
         JSON.parse(JSON.stringify(this.boardStartState)),
         this.moveHistory
       );
@@ -168,11 +195,13 @@ h3f5`,
     goToStart: function () {
       this.buildFuture()
       this.boardPlayState = JSON.parse(JSON.stringify(this.boardStartState))
+      this.firstMoverPicks = []
+      this.secondMoverPicks = []
     },
 
     goToEnd: function () {
       this.buildHistory();
-      this.boardPlayState = hydrateBoard(
+      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
         JSON.parse(JSON.stringify(this.boardStartState)),
         this.moveHistory
       );
