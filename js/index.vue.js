@@ -106,18 +106,11 @@ h3f5`,
   },
 
   created() {
-    // try to restore previous work from localStorage
-    localBoardInput = localStorage.getItem('boardInput');
-    localMoveInput = localStorage.getItem('moveInput');
-    localFirstMover = localStorage.getItem('firstMover');
-    localSecondMover = localStorage.getItem('secondMover');
-
-    if (localBoardInput || localMoveInput) {
-      this.boardInput = localStorage.getItem('boardInput');
-      this.moveInput = localStorage.getItem('moveInput');
-      this.firstMover = localStorage.getItem('firstMover');
-      this.secondMover = localStorage.getItem('secondMover');
-    }
+    // Restore previous work from localStorage, if any 
+    this.boardInput = localStorage.getItem('boardInput') || this.boardInput;
+    this.moveInput = localStorage.getItem('moveInput') || this.moveInput;
+    this.firstMover = localStorage.getItem('firstMover') || this.firstMover;
+    this.secondMover = localStorage.getItem('secondMover') || this.secondMover;
 
     this.boardStartState = buildStartState(this.boardInput)
     this.buildHistory();
@@ -141,24 +134,14 @@ h3f5`,
       this.moveHistory = [];
     },
 
-    updateBoardInput: function () {
+    updateInputs: function () {
       // save work into localStorage
       localStorage.setItem('boardInput', this.boardInput);
-      localStorage.setItem('firstMover', this.firstMover);
-      localStorage.setItem('secondMover', this.secondMover);
-
-      this.boardPlayState = hydrateBoard(
-        JSON.parse(JSON.stringify(this.boardStartState)),
-        this.moveHistory
-      );
-    },
-
-    updateMoveInput: function () {
-      // save work into localStorage
       localStorage.setItem('moveInput', this.moveInput);
       localStorage.setItem('firstMover', this.firstMover);
       localStorage.setItem('secondMover', this.secondMover);
 
+      this.boardStartState = buildStartState(this.boardInput)
       this.buildHistory();
       this.boardPlayState = hydrateBoard(
         JSON.parse(JSON.stringify(this.boardStartState)),

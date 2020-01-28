@@ -27,7 +27,7 @@
       <!-- Record/Edit Mode -->
       <div v-if='showInput'>
         <label>Initial board state</label><br>
-        <input type='text' size='52' v-model='boardInput' v-on:change='updateBoardInput'><br>
+        <input type='text' size='52' v-model='boardInput' v-on:change='updateInputs'><br>
 
         <label>First Mover</label><br>
         <input type='text' size='16' maxlength='16' v-model='firstMover'><br>
@@ -36,7 +36,7 @@
         <input type='text' size='16' maxlength='16' v-model='secondMover'><br>
 
         <label>Move History</label><br>
-        <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateMoveInput' @keyup.enter.prevent='updateMoveInput'></textarea><br>
+        <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateMoveInput'></textarea><br>
       </div>
 
       <!-- Playback Mode -->
