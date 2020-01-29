@@ -100,9 +100,32 @@ svg text {
   fill: var(--black);
 }
 
-.r { fill: var(--red); }
-.g { fill: var(--green); }
-.b { fill: var(--blue); }
-.w { fill: var(--white); }
-.k { fill: var(--black); }
-.z { fill: var(--wild); }
+.r {  fill: var(--red);
+      background-color: var(--red); }
+.g {  fill: var(--green);
+      background-color: var(--green); }
+.b {  fill: var(--blue);
+      background-color: var(--blue); }
+.w {  fill: var(--white);
+      background-color: var(--white); }
+.k {  fill: var(--black);
+      background-color: var(--black); }
+.z {  fill: var(--wild);
+      background-color: var(--wild); }
+
+.pick-container {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+.pick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 1rem;
+}
+.pick.w {
+  color: var(--black);
+}

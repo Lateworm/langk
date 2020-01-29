@@ -42,6 +42,7 @@ const buildStartState = (boardInput) => {
 }
 
 const hydrateBoard = (boardState, moves) => {
+  let boardPlayState = JSON.parse(JSON.stringify(boardState))
   let p1Picks = []
   let p2Picks = []
   let p1Stacks = []
@@ -60,31 +61,31 @@ const hydrateBoard = (boardState, moves) => {
       }
 
       // push the pieces onto the destination stack
-      boardState[origin].forEach(piece => {
-        boardState[destination].push(piece)
+      boardPlayState[origin].forEach(piece => {
+        boardPlayState[destination].push(piece)
       })
 
       // clear the source stack
-      boardState[origin] = []
+      boardPlayState[origin] = []
       
       // Remove stacks of 5 from the board
-      if (boardState[destination].length > 4) {
+      if (boardPlayState[destination].length > 4) {
         
         if (i % 2 === 0) {
-          p1Stacks.push(boardState[destination].reduce((acc, cur) => {
+          p1Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
             return acc + cur.colour
           }, ''))
         } else if (i % 2 === 1) {
-          p2Stacks.push(boardState[destination].reduce((acc, cur) => {
+          p2Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
             return acc + cur.colour
           }, ''))
         }
         
-        boardState[destination] = []
+        boardPlayState[destination] = []
       }
 
       // update display coordinates
-      boardState[destination].forEach((piece, i) => {
+      boardPlayState[destination].forEach((piece, i) => {
         const {x, y} = pieceDisplayPosition(destination, i+1)
         piece.x = x
         piece.y = y
@@ -92,7 +93,13 @@ const hydrateBoard = (boardState, moves) => {
     }
   })
 
-  return [ boardState, p1Picks, p2Picks, p1Stacks, p2Stacks ]
+  return {
+    boardPlayState: boardPlayState,
+    p1Picks: p1Picks,
+    p2Picks: p2Picks,
+    p1Stacks: p1Stacks,
+    p2Stacks: p2Stacks,
+  }
 }
 
 //  ---------
@@ -109,10 +116,10 @@ const langk = new Vue({
     boardInput: 'g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b',
     boardStartState: {},
     boardPlayState: {},
-    firstMover: 'Alf',
-    secondMover: 'Betty',
-    firstMoverPicks: [],
-    secondMoverPicks: [],
+    p1: 'Alf',
+    p2: 'Betty',
+    p1Picks: [],
+    p2Picks: [],
     p1Stacks: [],
     p2Stacks: [],
     moveInput:
@@ -136,16 +143,18 @@ h3f5`,
     // Restore previous work from localStorage, if any 
     this.boardInput = localStorage.getItem('boardInput') || this.boardInput;
     this.moveInput = localStorage.getItem('moveInput') || this.moveInput;
-    this.firstMover = localStorage.getItem('firstMover') || this.firstMover;
-    this.secondMover = localStorage.getItem('secondMover') || this.secondMover;
+    this.p1 = localStorage.getItem('p1') || this.p1;
+    this.p2 = localStorage.getItem('p2') || this.p2;
 
     this.boardStartState = buildStartState(this.boardInput)
     this.buildHistory();
 
-    [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
-      JSON.parse(JSON.stringify(this.boardStartState)),
-      this.moveHistory
-    );
+    const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+    this.boardPlayState = gameState.boardPlayState
+    this.p1Picks = gameState.p1Picks
+    this.p2Picks = gameState.p2Picks
+    this.p1Stacks = gameState.p1Stacks
+    this.p2Stacks = gameState.p2Stacks
   },
 
   methods: {
@@ -165,46 +174,62 @@ h3f5`,
       // save work into localStorage
       localStorage.setItem('boardInput', this.boardInput);
       localStorage.setItem('moveInput', this.moveInput);
-      localStorage.setItem('firstMover', this.firstMover);
-      localStorage.setItem('secondMover', this.secondMover);
+      localStorage.setItem('p1', this.p1);
+      localStorage.setItem('p2', this.p2);
 
       this.boardStartState = buildStartState(this.boardInput)
       this.buildHistory();
-      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
-        JSON.parse(JSON.stringify(this.boardStartState)),
-        this.moveHistory
-      );
+
+      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+      this.boardPlayState = gameState.boardPlayState
+      this.p1Picks = gameState.p1Picks
+      this.p2Picks = gameState.p2Picks
+      this.p1Stacks = gameState.p1Stacks
+      this.p2Stacks = gameState.p2Stacks
     },
 
     stepBack: function () {
       this.moveFuture.unshift(this.moveHistory.pop());
-      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
-        JSON.parse(JSON.stringify(this.boardStartState)),
-        this.moveHistory
-      );
+
+      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+      this.boardPlayState = gameState.boardPlayState
+      this.p1Picks = gameState.p1Picks
+      this.p2Picks = gameState.p2Picks
+      this.p1Stacks = gameState.p1Stacks
+      this.p2Stacks = gameState.p2Stacks
     },
 
     stepForward: function () {
       this.moveHistory.push(this.moveFuture.shift());
-      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
-        JSON.parse(JSON.stringify(this.boardStartState)),
-        this.moveHistory
-      );
+
+      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+      this.boardPlayState = gameState.boardPlayState
+      this.p1Picks = gameState.p1Picks
+      this.p2Picks = gameState.p2Picks
+      this.p1Stacks = gameState.p1Stacks
+      this.p2Stacks = gameState.p2Stacks
     },
 
     goToStart: function () {
       this.buildFuture()
-      this.boardPlayState = JSON.parse(JSON.stringify(this.boardStartState))
-      this.firstMoverPicks = []
-      this.secondMoverPicks = []
+
+      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+      this.boardPlayState = gameState.boardPlayState
+      this.p1Picks = gameState.p1Picks
+      this.p2Picks = gameState.p2Picks
+      this.p1Stacks = gameState.p1Stacks
+      this.p2Stacks = gameState.p2Stacks   
     },
 
     goToEnd: function () {
       this.buildHistory();
-      [ this.boardPlayState, this.firstMoverPicks, this.secondMoverPicks, this.p1Stacks,  this.p2Stacks] = hydrateBoard(
-        JSON.parse(JSON.stringify(this.boardStartState)),
-        this.moveHistory
-      );
+      
+      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
+      this.boardPlayState = gameState.boardPlayState
+      this.p1Picks = gameState.p1Picks
+      this.p2Picks = gameState.p2Picks
+      this.p1Stacks = gameState.p1Stacks
+      this.p2Stacks = gameState.p2Stacks
     },
   },
 })

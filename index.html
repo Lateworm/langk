@@ -30,10 +30,10 @@
         <input type='text' size='52' v-model='boardInput' v-on:change='updateInputs'><br>
 
         <label>First Mover</label><br>
-        <input type='text' size='16' maxlength='16' v-model='firstMover'><br>
+        <input type='text' size='16' maxlength='16' v-model='p1'><br>
 
         <label>Second Mover</label><br>
-        <input type='text' size='16' maxlength='16' v-model='secondMover'><br>
+        <input type='text' size='16' maxlength='16' v-model='p2'><br>
 
         <label>Move History</label><br>
         <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateInputs'></textarea><br>
@@ -43,25 +43,31 @@
       <div v-if='!showInput'>
         <h2>Players</h2>
 
-        <h3>{{ firstMover }}</h3>
-        <span>picks:</span><span v-for='pick in firstMoverPicks'>{{ pick }}</span><br>
-        <span>stacks:</span><span v-for='stack in p1Stacks'>{{ stack }}&nbsp;</span>
+        <h3>{{ p1 }}</h3>
+        <span>picks:</span>
+        <div v-for='pick in p1Picks' class='pick-container'>
+          <div class='pick' :class='pick'>{{ pick }}</div>
+        </div><br>
+        <span>stacks: {{ p1Stacks.length }}</span>
 
-        <h3>{{ secondMover }}</h3>
-        <span>picks:</span><span v-for='pick in secondMoverPicks'>{{ pick }}</span><br>
-        <span>stacks:</span><span v-for='stack in p2Stacks'>{{ stack }}&nbsp;</span>
+        <h3>{{ p2 }}</h3>
+        <span>picks:</span>
+        <div v-for='pick in p2Picks' class='pick-container'>
+          <div class='pick' :class='pick'>{{ pick }}</div>
+        </div><br>
+        <span>stacks: {{ p2Stacks.length }}</span>
 
         <h2>Moves</h2>
         <ul>
           <li v-for='(move, i) in moveHistory'>
-            <span v-if='i % 2 === 0'>{{ firstMover }}</span>
-            <span v-if='i % 2 === 1'>{{ secondMover }}</span>
+            <span v-if='i % 2 === 0'>{{ p1 }}</span>
+            <span v-if='i % 2 === 1'>{{ p2 }}</span>
             <span>{{ move }}</span>
           </li>
           <li>👀</li>
           <li v-for='(move, i) in moveFuture' class='future'>
-            <span v-if='(i + moveHistory.length) % 2 === 0'>{{ firstMover }}</span>
-            <span v-if='(i + moveHistory.length) % 2 === 1'>{{ secondMover }}</span>
+            <span v-if='(i + moveHistory.length) % 2 === 0'>{{ p1 }}</span>
+            <span v-if='(i + moveHistory.length) % 2 === 1'>{{ p2 }}</span>
             <span>{{ move }}</span>
           </li>
         </ul>
