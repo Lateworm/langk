@@ -137,6 +137,10 @@ h3f5`,
     ],
     moveFuture: [
     ],
+
+    // experimental color schemeing
+    colorScheme: 'rioGrande'
+
   },
 
   created() {
@@ -145,6 +149,7 @@ h3f5`,
     this.moveInput = localStorage.getItem('moveInput') || this.moveInput;
     this.p1 = localStorage.getItem('p1') || this.p1;
     this.p2 = localStorage.getItem('p2') || this.p2;
+    this.colorScheme = localStorage.getItem('colorScheme') || this.colorScheme;
 
     this.boardStartState = buildStartState(this.boardInput)
     this.buildHistory();
@@ -176,6 +181,7 @@ h3f5`,
       localStorage.setItem('moveInput', this.moveInput);
       localStorage.setItem('p1', this.p1);
       localStorage.setItem('p2', this.p2);
+      localStorage.setItem('colorScheme', this.colorScheme);
 
       this.boardStartState = buildStartState(this.boardInput)
       this.buildHistory();

@@ -8,13 +8,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   
-  <link rel="stylesheet" href="css/reset.css">
-  <link href="https://fonts.googleapis.com/css?family=Courier+Prime&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel='stylesheet' href="css/reset.css">
+  <link href="https://fonts.googleapis.com/css?family=Courier+Prime&display=swap" rel='stylesheet'>
+  <link rel='stylesheet' href="css/styles.css">
 </head>
 
 <body>
   <section id='vue'>
+    <link v-if='colorScheme === "rioGrande"' rel='stylesheet' href="css/color-rio-grande.css">
+    <link v-if='colorScheme === "neutral"' rel='stylesheet' href="css/color-neutral.css">
+    <link v-if='colorScheme === "code"' rel='stylesheet' href="css/color-code.css">
+
     <div class='control-panel'>
       <h1>LYNGK Replay Tool</h1>
 
@@ -37,6 +41,13 @@
 
         <label>Move History</label><br>
         <textarea cols='8' rows='32' v-model='moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateInputs'></textarea><br>
+
+        <label>Color Scheme</label><br>
+        <select v-model="colorScheme" v-on:change='updateInputs'>
+          <option value="rioGrande">Rio Grande</option>
+          <option value="neutral">Neutral</option>
+          <option value="code">Don't try this one, you'll regret it. I already regret making it</option>
+        </select><br>
       </div>
 
       <!-- Playback Mode -->
