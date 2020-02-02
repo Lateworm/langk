@@ -110,19 +110,10 @@ const langk = new Vue({
   el: '#vue',
 
   data: {
-    moveHistory: [],
-    moveFuture: [],
-    showInput: false,
-    boardInput: 'g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b',
-    boardStartState: {},
-    boardPlayState: {},
-    p1: 'Alf',
-    p2: 'Betty',
-    p1Picks: [],
-    p2Picks: [],
-    p1Stacks: [],
-    p2Stacks: [],
-    moveInput:
+    // User inputs backed by localStorage
+    input: {
+      boardInput: 'g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b',
+      moveInput:
 `e3d2
 b1c2
 e1d1
@@ -133,109 +124,83 @@ g5h4
 c6c7
 -
 h3f5`,
-    moveHistory: [
-    ],
-    moveFuture: [
-    ],
+      p1: 'Alf',
+      p2: 'Betty',
+      colorScheme: 'rioGrande',
+    },
+    
+    // Game state created by hydrateBoard()
+    gameState: {
+      boardPlayState: {},
+      p1Picks: [],
+      p2Picks: [],
+      p1Stacks: [],
+      p2Stacks: [],
+    },
 
-    // experimental color schemeing
-    colorScheme: 'rioGrande'
-
+    // stragglers
+    showInput: false,
+    boardStartState: {},
+    moveHistory: [],
+    moveFuture: [],
   },
 
   created() {
     // Restore previous work from localStorage, if any 
-    this.boardInput = localStorage.getItem('boardInput') || this.boardInput;
-    this.moveInput = localStorage.getItem('moveInput') || this.moveInput;
-    this.p1 = localStorage.getItem('p1') || this.p1;
-    this.p2 = localStorage.getItem('p2') || this.p2;
-    this.colorScheme = localStorage.getItem('colorScheme') || this.colorScheme;
+    try {
+      this.input = JSON.parse(localStorage.getItem('input'))
+    }
+    catch(error) {
+      console.error(error)
+      alert('Sorry, unable to load your last saved state.')
+    }
 
-    this.boardStartState = buildStartState(this.boardInput)
+    this.boardStartState = buildStartState(this.input.boardInput)
     this.buildHistory();
 
-    const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-    this.boardPlayState = gameState.boardPlayState
-    this.p1Picks = gameState.p1Picks
-    this.p2Picks = gameState.p2Picks
-    this.p1Stacks = gameState.p1Stacks
-    this.p2Stacks = gameState.p2Stacks
+    this.gameState = hydrateBoard(this.boardStartState, this.moveHistory);
   },
 
   methods: {
     buildHistory: function () {
       // parse the input string into a usable structure
-      this.moveHistory = this.moveInput.match(/([^\r\n]+)/g) || [];
+      this.moveHistory = this.input.moveInput.match(/([^\r\n]+)/g) || [];
       this.moveFuture = [];
     },
 
     buildFuture: function () {
       // parse the input string into a usable structure
-      this.moveFuture = this.moveInput.match(/([^\r\n]+)/g) || [];
+      this.moveFuture = this.input.moveInput.match(/([^\r\n]+)/g) || [];
       this.moveHistory = [];
     },
 
     updateInputs: function () {
       // save work into localStorage
-      localStorage.setItem('boardInput', this.boardInput);
-      localStorage.setItem('moveInput', this.moveInput);
-      localStorage.setItem('p1', this.p1);
-      localStorage.setItem('p2', this.p2);
-      localStorage.setItem('colorScheme', this.colorScheme);
+      localStorage.setItem('input', JSON.stringify(this.input));
 
-      this.boardStartState = buildStartState(this.boardInput)
+      this.boardStartState = buildStartState(this.input.boardInput)
       this.buildHistory();
-
-      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-      this.boardPlayState = gameState.boardPlayState
-      this.p1Picks = gameState.p1Picks
-      this.p2Picks = gameState.p2Picks
-      this.p1Stacks = gameState.p1Stacks
-      this.p2Stacks = gameState.p2Stacks
+      this.gameState = hydrateBoard(this.boardStartState, this.moveHistory);
     },
 
     stepBack: function () {
       this.moveFuture.unshift(this.moveHistory.pop());
-
-      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-      this.boardPlayState = gameState.boardPlayState
-      this.p1Picks = gameState.p1Picks
-      this.p2Picks = gameState.p2Picks
-      this.p1Stacks = gameState.p1Stacks
-      this.p2Stacks = gameState.p2Stacks
+      this.gameState = hydrateBoard(this.boardStartState, this.moveHistory); 
     },
 
     stepForward: function () {
       this.moveHistory.push(this.moveFuture.shift());
-
-      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-      this.boardPlayState = gameState.boardPlayState
-      this.p1Picks = gameState.p1Picks
-      this.p2Picks = gameState.p2Picks
-      this.p1Stacks = gameState.p1Stacks
-      this.p2Stacks = gameState.p2Stacks
+      this.gameState = hydrateBoard(this.boardStartState, this.moveHistory);
     },
 
     goToStart: function () {
       this.buildFuture()
-
-      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-      this.boardPlayState = gameState.boardPlayState
-      this.p1Picks = gameState.p1Picks
-      this.p2Picks = gameState.p2Picks
-      this.p1Stacks = gameState.p1Stacks
-      this.p2Stacks = gameState.p2Stacks   
+      this.gameState = hydrateBoard(this.boardStartState, this.moveHistory);
     },
 
     goToEnd: function () {
-      this.buildHistory();
-      
-      const gameState = hydrateBoard(this.boardStartState, this.moveHistory);
-      this.boardPlayState = gameState.boardPlayState
-      this.p1Picks = gameState.p1Picks
-      this.p2Picks = gameState.p2Picks
-      this.p1Stacks = gameState.p1Stacks
-      this.p2Stacks = gameState.p2Stacks
+      this.buildHistory();     
+      this.gameState = hydrateBoard(this.boardStartState, this.moveHistory);
     },
   },
 })
