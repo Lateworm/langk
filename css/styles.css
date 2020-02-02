@@ -118,3 +118,8 @@ svg text {
 .pick.w {
   color: var(--black);
 }
+
+.picks {
+  display: inline-block;
+  height: 2rem;
+}

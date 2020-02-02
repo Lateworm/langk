@@ -56,15 +56,21 @@
 
         <h3>{{ p1 }}</h3>
         <span>picks:</span>
-        <div v-for='pick in p1Picks' class='pick-container'>
-          <div class='pick' :class='pick'>{{ pick }}</div>
+        <div class='picks'>
+          <span>picks:</span>
+          <div v-for='pick in p1Picks' class='pick-container'>
+            <div class='pick' :class='pick'>{{ pick }}</div>
+          </div>
         </div><br>
         <span>stacks: {{ p1Stacks.length }}</span>
 
         <h3>{{ p2 }}</h3>
         <span>picks:</span>
-        <div v-for='pick in p2Picks' class='pick-container'>
-          <div class='pick' :class='pick'>{{ pick }}</div>
+        <div class='picks'>
+          <span>picks:</span>
+          <div v-for='pick in p2Picks' class='pick-container'>
+            <div class='pick' :class='pick'>{{ pick }}</div>
+          </div>
         </div><br>
         <span>stacks: {{ p2Stacks.length }}</span>
 
