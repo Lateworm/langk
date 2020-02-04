@@ -147,13 +147,8 @@ h3f5`,
 
   created() {
     // Restore previous work from localStorage, if any 
-    try {
-      this.input = JSON.parse(localStorage.getItem('input'))
-    }
-    catch(error) {
-      console.error(error)
-      alert('Sorry, unable to load your last saved state.')
-    }
+    const localInput = JSON.parse(localStorage.getItem('input'))
+    if (localInput) { this.input = localInput }
 
     this.boardStartState = buildStartState(this.input.boardInput)
     this.buildHistory();
