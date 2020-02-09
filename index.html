@@ -32,6 +32,10 @@
         <label>Initial board state</label><br>
         <input type='text' size='52' v-model='input.boardInput' v-on:change='updateInputs'><br>
 
+        <button v-on:click='generateRandomBoard'>
+          Generate Random Board
+        </button><br>
+
         <label>First Mover</label><br>
         <input type='text' size='16' maxlength='16' v-model='input.p1' v-on:change='updateInputs'><br>
 
@@ -39,7 +43,7 @@
         <input type='text' size='16' maxlength='16' v-model='input.p2' v-on:change='updateInputs'><br>
 
         <label>Move History</label><br>
-        <textarea cols='8' rows='32' v-model='input.moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateInputs'></textarea><br>
+        <textarea cols='8' rows='16' v-model='input.moveInput' v-on:change='updateInputs' @keyup.enter.prevent='updateInputs'></textarea><br>
 
         <label>Color Scheme</label><br>
         <select v-model="input.colorScheme" v-on:change='updateInputs'>
