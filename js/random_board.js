@@ -1,4 +1,4 @@
-// this file courtesy of https://github.com/tanglebones
+// Random generation is courtesy of https://github.com/tanglebones
 
 function randomCtor(seed) {
   let current;
@@ -81,10 +81,10 @@ function determineSeed(seedString) {
   return seed;
 }
 
-let seed = determineSeed(process && process.argv && (process.argv.length > 2) ? process.argv.slice(2).join(' ') : undefined);
+// hard-coded seed for inital implementation
+// TODO: get a seed from Vue
+let seed = determineSeed('langk');
 
 const random = randomCtor(seed);
 const shuffle = shuffleCtor(random);
 const boardGenerator = randomBoardCtor(shuffle);
-
-console.log(boardGenerator());

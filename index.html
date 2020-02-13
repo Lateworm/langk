@@ -142,19 +142,26 @@
       <line x1='700' y1='259.8' x2='400' y2='779.4'/><!-- c7 / i1 -->
       <line x1='700' y1='433.0' x2='550' y2='692.8'/><!-- e7 / h4 -->
 
-      <template v-for='stack in gameState.boardPlayState'>
+      <template v-for='(stack, i) in gameState.boardPlayState'>
         <circle
           v-for='piece in stack'
           :cx='piece.x'
           :cy='piece.y'
           r='35'
-          :class='piece.colour'/>
+          :class='piece.colour'
+          v-on:click='clickPiece(i)'/>
       </template>
+
+      <text x='780' y='883'>{{ lastClickedPosition }}</text>
     </svg>
   </section>
 </body>
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script type="text/javascript" src="js/random_board.js"></script>
+<script type="text/javascript" src="js/deps.js"></script>
+
+<!-- The main 'index' JS must be imported last so that dependencies are satisfied -->
 <script type="text/javascript" src="js/index.vue.js"></script>
 
 </html>
