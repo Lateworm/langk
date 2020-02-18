@@ -67,21 +67,24 @@ const hydrateBoard = (boardState, moves) => {
 
       // clear the source stack
       boardPlayState[origin] = []
-      
-      // Remove stacks of 5 from the board
+
+      // Remove newly-formed stacks of 5 from the board
       if (boardPlayState[destination].length > 4) {
-        
-        if (i % 2 === 0) {
+        const stackColour = boardPlayState[destination][boardPlayState[destination].length-1].colour 
+
+        if (i % 2 === 0 && p1Picks.includes(stackColour)) {
           p1Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
             return acc + cur.colour
           }, ''))
-        } else if (i % 2 === 1) {
+
+          boardPlayState[destination] = []
+        } else if (i % 2 === 1 && p2Picks.includes(stackColour)) {
           p2Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
             return acc + cur.colour
           }, ''))
+
+          boardPlayState[destination] = []
         }
-        
-        boardPlayState[destination] = []
       }
 
       // update display coordinates
