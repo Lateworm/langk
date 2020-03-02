@@ -1,7 +1,22 @@
+/* The default 'Rio Grande' colour scheme */
+:root {
+  --bg-main: hsl(40, 18%, 80%);
+  --bg-alt: hsl(40, 18%, 85%);
+  --fg-main: hsl(40, 10%, 25%);
+  --fg-alt: hsl(40, 10%, 55%);
+
+  --red: hsl(0, 80%, 50%);
+  --green: hsl(120, 82%, 35%);
+  --blue: hsl(240, 78%, 50%);
+  --white: hsl(40, 100%, 92%);
+  --black: hsl(0, 90%, 8%);
+  --wild: hsl(0, 5%, 65%);
+}
+
 body {
   background-color: var(--bg-main);
-  color: var(--black);
-  font-family: 'Courier Prime', monospace;
+  color: var(--fg-main);
+  font-family: 'Inconsolata', monospace;
   padding: 0;
 }
 
@@ -29,9 +44,9 @@ input,
 textarea,
 button,
 select {
-  background-color: var(--bg-light);
-  color: var(--black);
-  font-family: 'Courier Prime', monospace;
+  background-color: var(--bg-alt);
+  color: var(--fg-main);
+  font-family: 'Inconsolata', monospace;
   font-size: 1rem;
   margin-bottom: .5rem;
   padding: .35rem .5rem;
@@ -44,13 +59,13 @@ select {
 }
 
 button {
-  border: 1px solid var(--fg-light);
+  border: 1px solid var(--fg-alt);
   border-radius: 4px;
 }
 
 button:disabled,
 .future {
-  color: var(--fg-light);
+  color: var(--fg-main);
 }
 
 ul {
@@ -67,7 +82,7 @@ li {
 }
 
 li:nth-child(even) { 
-  background-color: var(--bg-light);
+  background-color: var(--bg-alt);
 }
 
 
@@ -79,14 +94,14 @@ svg {
   align-self: start;
 }
 svg line {
-  stroke: var(--fg-light);
+  stroke: var(--fg-alt);
   stroke-width: 2;
 }
 svg polygon {
-  fill: var(--bg-light);
+  fill: var(--bg-alt);
 }
 svg text {
-  fill: var(--black);
+  fill: var(--fg-main);
 }
 
 .r {  fill: var(--red);
@@ -110,13 +125,13 @@ svg text {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--white);
+  color: var(--bg-main);
   width: 2rem;
   height: 2rem;
   border-radius: 1rem;
 }
 .pick.w {
-  color: var(--black);
+  color: var(--fg-main);
 }
 
 .picks {

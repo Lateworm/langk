@@ -1,7 +1,8 @@
 :root {
-  --bg-main: hsl(40, 0%, 80%);
-  --bg-light: hsl(40, 0%, 85%);
-  --fg-light: hsl(40, 0%, 45%);
+  --bg-main: hsl(0, 0%, 80%);
+  --bg-alt: hsl(0, 0%, 85%);
+  --fg-main: hsl(0, 0%, 45%);
+  --fg-alt: hsl(0, 0%, 55%);
 
   --red: hsl(0, 80%, 50%);
   --green: hsl(120, 82%, 35%);
