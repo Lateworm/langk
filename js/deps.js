@@ -55,34 +55,51 @@ const hydrateBoard = (boardState, moves) => {
         const destination = move.substring(move.length-2, move.length)
         const pick = move.substring(move.length-6, move.length-5)
 
+        const sourceStack = boardPlayState[origin]
+        const destinationStack = [...boardPlayState[destination]]
+        const destinationStackColours = []
+
+        const originHeight = boardPlayState[origin].length
+        const destinationHeight = boardPlayState[destination].length
+        const resultingHeight = originHeight + destinationHeight
+        const originTopColour = boardPlayState[origin][originHeight - 1].colour
+        const destinationTopColour = boardPlayState[destination][destinationHeight - 1].colour
+
+        // attribute picks
         if (pick.length && i % 2 === 0) {
           p1Picks.push(pick)
         } else if (pick.length && i % 2 === 1) {
           p2Picks.push(pick)
         }
 
-        const originHeight = boardPlayState[origin].length
-        const destinationHeight = boardPlayState[destination].length
-        const resultingHeight = originHeight + destinationHeight
-        const originColour = boardPlayState[origin][originHeight - 1].colour
-        const destinationColour = boardPlayState[destination][destinationHeight - 1].colour
+        // push the pieces onto the destination stack
+        sourceStack.forEach(piece => {
+          destinationStack.push(piece)
+        })
 
-        // BASIC MOVE VALIDATION
-          // the top colour of the origin must not be owned by the opponent
-          
-          if (resultingHeight > 5) {
-            throw `Invlaid move ${move}: The resulting stack is ${resultingHeight} pieces tall`;
+
+        // validate the move
+        // simplest checks first so we can return as early as possible
+        if (resultingHeight > 5) {
+          throw `Invlaid move ${move}: The resulting stack would be ${resultingHeight} pieces tall`;
+        }
+
+        destinationStack.forEach(piece => {
+          console.log(piece.colour)
+          if (destinationStackColours.includes(piece.colour)) {
+            throw `Invalid move ${move}: The resulting stack would contain duplicate colours`;
+          } else {
+            destinationStackColours.push(piece.colour)
           }
+        })
 
-          // the destination must be accessible from the origin
-            // so straight line,
-            // or else linkable though picked colour
-
-          // The stack must be equal or greater height than the destination
-            // Or else the top colour from the origin stack must be owned by the mover
-
-
-
+        // the top colour of the origin must not be owned by the opponent
+        // the destination must be accessible from the origin
+          // so straight line,
+          // or else linkable though picked colour
+        // The stack must be equal or greater height than the destination
+          // Or else the top colour from the origin stack must be owned by the mover
+        
         // push the pieces onto the destination stack
         boardPlayState[origin].forEach(piece => {
           boardPlayState[destination].push(piece)
@@ -120,6 +137,7 @@ const hydrateBoard = (boardState, moves) => {
     })
   } catch(e) {
     alert(e);
+    // TODO: debug double alerts
   }
 
 
