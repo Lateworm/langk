@@ -4,9 +4,12 @@ const pieceDisplayPosition = (position, height) => {
   const rowXOffsets = [400, 250, 100, 150, 100, 150, 100, 250, 400]
   const heightOffset = 8
 
+  const x = rowXOffsets[rows[row] - 1] + ((col-1) * 100)
+  const y = Math.sin(1.0472) * rows[row] * 100 - (heightOffset * (height - 1))
+
   return {
-    x: rowXOffsets[rows[row] - 1] + ((col-1) * 100),
-    y: Math.sin(1.0472) * rows[row] * 100 - (heightOffset * (height - 1)),
+    x: x,
+    y: Math.round(y * 10) / 10,
   }
 }
 
@@ -41,105 +44,134 @@ const buildStartState = (boardInput) => {
   return state
 }
 
+const validateMove = (moveContext) => {
+  const { boardState, picks, pick, origin, destination } = moveContext
+
+  // TODO: refactor to take named params
+  // Here, we don't need a concept of which player's turn it is
+
+  let boardPlayState = JSON.parse(JSON.stringify(boardState))
+  const originStack = boardPlayState[origin]
+  const originHeight = boardPlayState[origin].length
+  const originTopColour = boardPlayState[origin][originHeight - 1].colour
+  const destinationStack = boardPlayState[destination]
+  const destinationHeight = boardPlayState[destination].length
+  const resultStack = [...destinationStack, ...originStack]
+  
+  const resultStackColours = []
+
+  // simplest checks first so we can return as early as possible
+  if (originTopColour === 'z') {
+    return `Invalid move ${origin}${destination}: the player may not move a wild`
+  }
+
+  if (resultStack.length > 5) {
+    return `Invalid move ${origin}${destination}: The resulting stack would be ${resultStack.length} pieces tall`
+  }
+
+  // attribute picks
+  if (pick) {
+    if (picks.includes(pick)) {
+      return `Invalid colour pick ${pick}: the player has already picked this colour`
+    } else if (picks.length >= 2) {
+      return `Invalid colour pick ${pick}: the player may not pick more than 2 colours`  
+    } else {
+      picks.push(pick)
+    }
+  }
+
+  for (let i = 0; i < resultStack.length; i++) {
+    if (resultStackColours.includes(resultStack[i].colour)) {
+      return `Invalid move ${origin}${destination}: The resulting stack would contain duplicate colours`
+    } else {
+      resultStackColours.push(resultStack[i].colour)
+    }
+  }
+
+  // the top colour of the origin must not be owned by the opponent
+  // the destination must be accessible from the origin
+    // so straight line,
+    // or else linkable though picked colour
+  // The stack must be equal or greater height than the destination
+    // Or else the top colour from the origin stack must be owned by the mover
+
+  return null
+
+  // TODO: duplicate alerts are caused by the input being updated twice:
+  // first when the user presses enter, and again when they leave the field.
+  // instead of using alerts, we shoudl render an error on the page
+}
+
 const hydrateBoard = (boardState, moves) => {
   let boardPlayState = JSON.parse(JSON.stringify(boardState))
   let p1Picks = []
   let p2Picks = []
   let p1Stacks = []
   let p2Stacks = []
+  
+  for (let i = 0; i < moves.length; i++) {
+    move = moves[i]
 
-  try {
-    moves.forEach((move, i) => {
-      if (move !== '-') {
-        const origin = move.substring(move.length-4, move.length-2)
-        const destination = move.substring(move.length-2, move.length)
-        const pick = move.substring(move.length-6, move.length-5)
+    if (move !== '-') {
+      const player = i % 2 === 0 ? 1 : 2
+      const origin = move.substring(move.length-4, move.length-2)
+      const destination = move.substring(move.length-2, move.length)
+      const pick = move.substring(move.length-6, move.length-5)
+      let error = null
 
-        const sourceStack = boardPlayState[origin]
-        const destinationStack = [...boardPlayState[destination]]
-        const destinationStackColours = []
-
-        const originHeight = boardPlayState[origin].length
-        const destinationHeight = boardPlayState[destination].length
-        const resultingHeight = originHeight + destinationHeight
-        const originTopColour = boardPlayState[origin][originHeight - 1].colour
-        const destinationTopColour = boardPlayState[destination][destinationHeight - 1].colour
-
-        // attribute picks
-        if (pick.length && i % 2 === 0) {
-          p1Picks.push(pick)
-        } else if (pick.length && i % 2 === 1) {
-          p2Picks.push(pick)
-        }
-
-        // push the pieces onto the destination stack
-        sourceStack.forEach(piece => {
-          destinationStack.push(piece)
-        })
-
-
-        // validate the move
-        // simplest checks first so we can return as early as possible
-        if (resultingHeight > 5) {
-          throw `Invlaid move ${move}: The resulting stack would be ${resultingHeight} pieces tall`;
-        }
-
-        destinationStack.forEach(piece => {
-          console.log(piece.colour)
-          if (destinationStackColours.includes(piece.colour)) {
-            throw `Invalid move ${move}: The resulting stack would contain duplicate colours`;
-          } else {
-            destinationStackColours.push(piece.colour)
-          }
-        })
-
-        // the top colour of the origin must not be owned by the opponent
-        // the destination must be accessible from the origin
-          // so straight line,
-          // or else linkable though picked colour
-        // The stack must be equal or greater height than the destination
-          // Or else the top colour from the origin stack must be owned by the mover
-        
-        // push the pieces onto the destination stack
-        boardPlayState[origin].forEach(piece => {
-          boardPlayState[destination].push(piece)
-        })
-
-        // clear the source stack
-        boardPlayState[origin] = []
-
-        // Remove newly-formed stacks of 5 from the board
-        if (boardPlayState[destination].length > 4) {
-          const stackColour = boardPlayState[destination][boardPlayState[destination].length-1].colour 
-
-          if (i % 2 === 0 && p1Picks.includes(stackColour)) {
-            p1Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
-              return acc + cur.colour
-            }, ''))
-
-            boardPlayState[destination] = []
-          } else if (i % 2 === 1 && p2Picks.includes(stackColour)) {
-            p2Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
-              return acc + cur.colour
-            }, ''))
-
-            boardPlayState[destination] = []
-          }
-        }
-
-        // update display coordinates
-        boardPlayState[destination].forEach((piece, i) => {
-          const {x, y} = pieceDisplayPosition(destination, i+1)
-          piece.x = x
-          piece.y = y
-        })
+      console.log(`validating move ${move}`)
+      if (player === 1) {
+        error = validateMove({boardState: boardPlayState, p1Picks, pick, origin, destination})
+      } else if (player === 2) {
+        error = validateMove({boardState: boardPlayState, p2Picks, pick, origin, destination})
       }
-    })
-  } catch(e) {
-    alert(e);
-    // TODO: debug double alerts
-  }
 
+      if (error) {
+        alert(error)
+        break
+      }
+
+      if (pick && player === 1) {
+        p1Picks.push(pick)
+      } else if (pick && player === 2) {
+        p2Picks.push(pick)
+      }
+
+      // push the pieces onto the destination stack
+      boardPlayState[origin].forEach(piece => {
+        boardPlayState[destination].push(piece)
+      })
+
+      // clear the source stack
+      boardPlayState[origin] = []
+
+      // Remove newly-formed stacks of 5 from the board
+      if (boardPlayState[destination].length > 4) {
+        const stackColour = boardPlayState[destination][boardPlayState[destination].length-1].colour 
+
+        if (i % 2 === 0 && p1Picks.includes(stackColour)) {
+          p1Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
+            return acc + cur.colour
+          }, ''))
+
+          boardPlayState[destination] = []
+        } else if (i % 2 === 1 && p2Picks.includes(stackColour)) {
+          p2Stacks.push(boardPlayState[destination].reduce((acc, cur) => {
+            return acc + cur.colour
+          }, ''))
+
+          boardPlayState[destination] = []
+        }
+      }
+
+      // update display coordinates
+      boardPlayState[destination].forEach((piece, i) => {
+        const {x, y} = pieceDisplayPosition(destination, i+1)
+        piece.x = x
+        piece.y = y
+      })
+    }
+  }
 
   return {
     boardPlayState: boardPlayState,
@@ -148,4 +180,10 @@ const hydrateBoard = (boardState, moves) => {
     p1Stacks: p1Stacks,
     p2Stacks: p2Stacks,
   }
+}
+
+// export functions for testing
+module.exports = {
+  pieceDisplayPosition: pieceDisplayPosition,
+  validateMove: validateMove,
 }

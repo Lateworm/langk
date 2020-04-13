@@ -2,7 +2,7 @@
 
 A tool for viewing a game of LYNGK.
 
-# Entering Data
+# Usage
 
 ## Entering the inital board state
 
@@ -36,3 +36,9 @@ e6f6
 -
 h3f5
 ```
+
+# Development
+
+## Testing
+
+`npm test`

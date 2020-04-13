@@ -1,0 +1,29 @@
+{
+  "name": "langk",
+  "version": "1.0.0",
+  "description": "A webapp to replay a game of Lyngk",
+  "main": "index.html",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "^7.1.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lateworm/LaNGK.git"
+  },
+  "keywords": [
+    "Lyngk"
+  ],
+  "author": "Travis Rempel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lateworm/LaNGK/issues"
+  },
+  "homepage": "https://github.com/Lateworm/LaNGK#readme"
+}
