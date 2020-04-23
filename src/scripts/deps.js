@@ -50,12 +50,12 @@ const validateMove = (moveContext) => {
   // TODO: refactor to take named params
   // Here, we don't need a concept of which player's turn it is
 
-  let boardPlayState = JSON.parse(JSON.stringify(boardState))
+  const boardPlayState = JSON.parse(JSON.stringify(boardState))
   const originStack = boardPlayState[origin]
   const originHeight = boardPlayState[origin].length
   const originTopColour = boardPlayState[origin][originHeight - 1].colour
   const destinationStack = boardPlayState[destination]
-  const destinationHeight = boardPlayState[destination].length
+  // const destinationHeight = boardPlayState[destination].length
   const resultStack = [...destinationStack, ...originStack]
   
   const resultStackColours = []
@@ -75,8 +75,6 @@ const validateMove = (moveContext) => {
       return `Invalid colour pick ${pick}: the player has already picked this colour`
     } else if (picks.length >= 2) {
       return `Invalid colour pick ${pick}: the player may not pick more than 2 colours`  
-    } else {
-      picks.push(pick)
     }
   }
 
@@ -110,7 +108,7 @@ const hydrateBoard = (boardState, moves) => {
   let p2Stacks = []
   
   for (let i = 0; i < moves.length; i++) {
-    move = moves[i]
+    const move = moves[i]
 
     if (move !== '-') {
       const player = i % 2 === 0 ? 1 : 2
@@ -119,11 +117,22 @@ const hydrateBoard = (boardState, moves) => {
       const pick = move.substring(move.length-6, move.length-5)
       let error = null
 
-      console.log(`validating move ${move}`)
       if (player === 1) {
-        error = validateMove({boardState: boardPlayState, p1Picks, pick, origin, destination})
+        error = validateMove({
+          boardState: boardPlayState,
+          picks: p1Picks, 
+          pick,
+          origin,
+          destination,
+        })
       } else if (player === 2) {
-        error = validateMove({boardState: boardPlayState, p2Picks, pick, origin, destination})
+        error = validateMove({
+          boardState: boardPlayState,
+          picks: p2Picks, 
+          pick,
+          origin,
+          destination,
+        })
       }
 
       if (error) {
@@ -182,8 +191,9 @@ const hydrateBoard = (boardState, moves) => {
   }
 }
 
-// export functions for testing
 module.exports = {
   pieceDisplayPosition: pieceDisplayPosition,
+  buildStartState: buildStartState,
   validateMove: validateMove,
+  hydrateBoard: hydrateBoard,
 }

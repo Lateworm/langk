@@ -1,18 +1,19 @@
-const validateMove = require('../js/deps').validateMove
+const validateMove = require('../src/scripts/deps').validateMove
+const { describe, it } = require('mocha')
 const assert = require('assert')
 
-describe('deps.validateMove()', function() {
+describe('validateMove()', function() {
   it('Valid move', function() {
     const boardState = {
       b1: [{ colour: 'r' }],
       b2: [{ colour: 'g' }],
     }
-    picks = []
-    pick = null
-    origin = 'b1'
-    destination = 'b2'
+    const picks = []
+    const pick = null
+    const origin = 'b1'
+    const destination = 'b2'
 
-    result = validateMove({
+    const result = validateMove({
       boardState,
       picks,
       pick,
@@ -23,18 +24,18 @@ describe('deps.validateMove()', function() {
     assert.equal( result, null )
   })
 
-  context('Invalid move', function() {
+  describe('Invalid move', function() {
     it("Moving a wild", function() {
       const boardState = {
         b1: [{ colour: 'z' }],
         b2: [{ colour: 'g' }],
       }
-      picks = []
-      pick = null
-      origin = 'b1'
-      destination = 'b2'
+      const picks = []
+      const pick = null
+      const origin = 'b1'
+      const destination = 'b2'
 
-      result = validateMove({
+      const result = validateMove({
         boardState,
         picks,
         pick,
@@ -50,12 +51,12 @@ describe('deps.validateMove()', function() {
         b1: [{ colour: 'r' }, { colour: 'g' }, { colour: 'b' }],
         b2: [{ colour: 'w' }, { colour: 'k' }, { colour: 'z' }],
       }
-      picks = []
-      pick = null
-      origin = 'b1'
-      destination = 'b2'
+      const picks = []
+      const pick = null
+      const origin = 'b1'
+      const destination = 'b2'
 
-      result = validateMove({
+      const result = validateMove({
         boardState,
         picks,
         pick,

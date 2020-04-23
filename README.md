@@ -2,9 +2,11 @@
 
 A tool for viewing a game of LYNGK.
 
-# Usage
+---
 
-## Entering the inital board state
+## Usage
+
+### Entering the inital board state
 
 Each colour of piece is represented by a single letter as follows:
 - `r`ed
@@ -17,7 +19,7 @@ Each colour of piece is represented by a single letter as follows:
 Record the board state starting with a1. Each row is separated by a `/`, such that a complete starting board may look like:
 `g/rrbr/wgzbwkg/kgkgkr/gwwbrww/bzrzkg/kwbwbbg/rkrk/b`
 
-## Entering Moves
+### Entering Moves
 
 A typical move is simply a 4-character string, where the first two characters represent the location of the stack to be played, and the last two represent its destination.
 
@@ -37,8 +39,40 @@ e6f6
 h3f5
 ```
 
-# Development
+---
 
-## Testing
+## Development
 
-`npm test`
+### Install dependencies
+```
+npm install
+```
+
+### Serve locally with hot-reloading
+```
+npm run serve
+```
+
+### Lint and fix Javascript
+```
+npm run lint
+```
+
+### Test
+```
+npm run test
+```
+
+### Configure
+See [Configuration Reference](https://cli.vuejs.org/config/).
+
+---
+
+## Production
+
+### Build
+```
+npm run build
+```
+By default, Vue builds to `/dist`. In order to serve this app on GitHub Pages, `/dist` is renamed `/docs` and `publicPath` is set to `""`.
+

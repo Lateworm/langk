@@ -88,3 +88,7 @@ let seed = determineSeed('langk');
 const random = randomCtor(seed);
 const shuffle = shuffleCtor(random);
 const boardGenerator = randomBoardCtor(shuffle);
+
+module.exports = {
+  boardGenerator: boardGenerator,
+}
