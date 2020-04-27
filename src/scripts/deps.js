@@ -5,6 +5,7 @@ const pieceDisplayPosition = (position, height) => {
   const heightOffset = 8
 
   const x = rowXOffsets[rows[row] - 1] + ((col-1) * 100)
+  // 0,0 is top left, so to move a piece up we reduce its y value
   const y = Math.sin(1.0472) * rows[row] * 100 - (heightOffset * (height - 1))
 
   return {
@@ -46,9 +47,6 @@ const buildStartState = (boardInput) => {
 
 const validateMove = (moveContext) => {
   const { boardState, picks, pick, origin, destination } = moveContext
-
-  // TODO: refactor to take named params
-  // Here, we don't need a concept of which player's turn it is
 
   const boardPlayState = JSON.parse(JSON.stringify(boardState))
   const originStack = boardPlayState[origin]

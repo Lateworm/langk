@@ -9,4 +9,11 @@ describe('pieceDisplayPosition()', function() {
     assert.equal( result.x, 400 )
     assert.equal( result.y, 86.6 )
   })
+
+  it('Two stack at A1', function() {
+    const result = pieceDisplayPosition('a1', 2)
+
+    assert.equal( result.x, 400 )
+    assert.equal( result.y, 78.6 )
+  })
 })
